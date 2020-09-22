@@ -1,9 +1,9 @@
 ## EWI MOD
- This is EWI MOD is useful for wind controller players. Compile with instructions below. 
-
-
-## Helm
-Helm is a free, cross-platform, polyphonic synthesizer that runs on GNU/Linux, Mac, and Windows as a standalone program and as a LV2/VST/AU/AAX plugin. Release is in beta so there are outstanding bugs. Please send any bugs found to matthewtytel@gmail.com
-
-### Installing:
+ This is EWI MOD is useful for wind controller players. Install Helm from the Helm Website.
+ 
+## Installing:
 Go to [tytel.org/helm](http://tytel.org/helm) for builds.
+
+## Replace VST3i:
+Locate your VST3 common folder find Helm.vst3 and replace the file with the ones in PC or MAC folder.
+ TO SUPPORT MAC OS MOJAVE or above YOU MUST COMPILE your OWN VST3i from the source files.
