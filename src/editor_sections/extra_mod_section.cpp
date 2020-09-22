@@ -18,7 +18,14 @@
 
 #include "colors.h"
 #include "fonts.h"
+#include "synth_button.h"
+#include "text_slider.h"
+#include "text_look_and_feel.h"
 #include "modulation_look_and_feel.h"
+
+#define TEXT_WIDTH 40
+#define SELECTOR_WIDTH 75
+#define TEXT_HEIGHT 16
 
 ExtraModSection::ExtraModSection(String name) : SynthSection(name) {
   addModulationButton(aftertouch_mod_ = new ModulationButton("aftertouch"));
@@ -33,20 +40,30 @@ ExtraModSection::ExtraModSection(String name) : SynthSection(name) {
   addModulationButton(mod_wheel_mod_ = new ModulationButton("mod_wheel"));
   mod_wheel_mod_->setLookAndFeel(ModulationLookAndFeel::instance());
 
+  addModulationButton(breath_mod_ = new ModulationButton("breath"));
+  breath_mod_->setLookAndFeel(ModulationLookAndFeel::instance());
+
   addModulationButton(pitch_wheel_mod_ = new ModulationButton("pitch_wheel"));
   pitch_wheel_mod_->setLookAndFeel(ModulationLookAndFeel::instance());
 
   addModulationButton(random_mod_ = new ModulationButton("random"));
   random_mod_->setLookAndFeel(ModulationLookAndFeel::instance());
+
+  addButton(legato_ = new SynthButton("legato"));
+  legato_->setLookAndFeel(TextLookAndFeel::instance());
+  legato_->setButtonText("");
 }
+
 
 ExtraModSection::~ExtraModSection() {
   aftertouch_mod_ = nullptr;
   note_mod_ = nullptr;
   velocity_mod_ = nullptr;
   mod_wheel_mod_ = nullptr;
+  breath_mod_ = nullptr;
   pitch_wheel_mod_ = nullptr;
   random_mod_ = nullptr;
+  legato_ = nullptr;
 }
 
 void ExtraModSection::drawTextToRightOfComponent(Graphics& g, Component* component, String text) {
@@ -57,7 +74,8 @@ void ExtraModSection::drawTextToRightOfComponent(Graphics& g, Component* compone
 
 void ExtraModSection::paintBackground(Graphics& g) {
   SynthSection::paintBackground(g);
-
+  int knob_width = getStandardKnobSize();
+  int text_height = size_ratio_ * TEXT_HEIGHT;
   g.setColour(Colors::control_label_text);
   g.setFont(Fonts::instance()->proportional_regular().withPointHeight(size_ratio_ * 10.0f));
   
@@ -65,23 +83,26 @@ void ExtraModSection::paintBackground(Graphics& g) {
   drawTextToRightOfComponent(g, note_mod_, TRANS("NOTE"));
   drawTextToRightOfComponent(g, velocity_mod_, TRANS("VELOCITY"));
   drawTextToRightOfComponent(g, mod_wheel_mod_, TRANS("MOD WHEEL"));
+  drawTextToRightOfComponent(g, breath_mod_, TRANS("BREATH"));
   drawTextToRightOfComponent(g, pitch_wheel_mod_, TRANS("PITCH WHEEL"));
   drawTextToRightOfComponent(g, random_mod_, TRANS("RANDOM"));
+  drawTextToRightOfComponent(g, legato_, TRANS("LEGATO"));
 }
 
 void ExtraModSection::resized() {
   int button_width = getModButtonWidth();
   int title_width = getTitleWidth();
-  int x = size_ratio_ * 30;
-  int x2 = getWidth() / 2 + size_ratio_ * 15.0f;
-  float space = (getHeight() - title_width - (3.0f * button_width)) / 4.0f;
-
-  aftertouch_mod_->setBounds(x, title_width + space, button_width, button_width);
-  note_mod_->setBounds(x, aftertouch_mod_->getBottom() + space, button_width, button_width);
+  int x = size_ratio_ * 35;
+  int x2 = getWidth() / 2 + size_ratio_ * 20.0f;
+  float space = (getHeight() - title_width - (4.0f * button_width)) / 5.0f;
+  breath_mod_->setBounds(x, title_width + space, button_width, button_width);
+  
+  note_mod_->setBounds(x, breath_mod_->getBottom() + space, button_width, button_width);
   velocity_mod_->setBounds(x, note_mod_->getBottom() + space, button_width, button_width);
-  mod_wheel_mod_->setBounds(x2, title_width + space, button_width, button_width);
+  mod_wheel_mod_->setBounds(x2, title_width + space, button_width, button_width); 
   pitch_wheel_mod_->setBounds(x2, mod_wheel_mod_->getBottom() + space, button_width, button_width);
   random_mod_->setBounds(x2, pitch_wheel_mod_->getBottom() + space, button_width, button_width);
-
+  aftertouch_mod_->setBounds(x, velocity_mod_->getBottom() + space, button_width, button_width);
+  legato_->setBounds(x2, random_mod_->getBottom() + space, button_width, button_width);
   SynthSection::resized();
 }

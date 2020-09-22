@@ -33,7 +33,7 @@ class DynamicSection : public SynthSection {
   private:
     ScopedPointer<SynthSlider> portamento_;
     ScopedPointer<SynthSlider> portamento_type_;
-    ScopedPointer<ToggleButton> legato_;
+   
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DynamicSection)
 };

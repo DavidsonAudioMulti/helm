@@ -38,15 +38,13 @@ DynamicSection::DynamicSection(String name) : SynthSection(name) {
   portamento_type_->setPopupPlacement(BubbleComponent::above, 0);
   port_type->setShortStringLookup(mopo::strings::off_auto_on_slider);
 
-  addButton(legato_ = new SynthButton("legato"));
-  legato_->setLookAndFeel(TextLookAndFeel::instance());
-  legato_->setButtonText("");
+
 }
 
 DynamicSection::~DynamicSection() {
   portamento_ = nullptr;
   portamento_type_ = nullptr;
-  legato_ = nullptr;
+ 
 }
 
 void DynamicSection::paintBackground(Graphics& g) {
@@ -62,8 +60,7 @@ void DynamicSection::paintBackground(Graphics& g) {
   drawTextForComponent(g, TRANS("PORTA"), portamento_);
   drawTextForComponent(g, TRANS("PORTA TYPE"), portamento_type_,
                        size_ratio_ * 4.0f + (knob_width - text_height) / 3.0f);
-  drawTextForComponent(g, TRANS("LEGATO"), legato_,
-                       size_ratio_ * 4.0f + (knob_width - text_height) / 3.0f);
+
 }
 
 void DynamicSection::resized() {
@@ -72,15 +69,14 @@ void DynamicSection::resized() {
   int text_height = size_ratio_ * TEXT_HEIGHT;
   int selector_width = size_ratio_ * SELECTOR_WIDTH;
 
-  float space_x = (getWidth() - (knob_width + selector_width + text_width)) / 4.0f;
-  float space_y = (getHeight() - (knob_width + text_height)) / 2.0f;
+  float space_x = (getWidth() - (knob_width + selector_width + text_width)) / 5.0f;
+  float space_y = (getHeight() - (knob_width + text_height)) / 3.0f;
   float extra_text_space = 2 * (knob_width - text_height) / 3;
 
   portamento_->setBounds(space_x, space_y, knob_width, knob_width);
-  portamento_type_->setBounds(knob_width + 2 * space_x, space_y + extra_text_space,
+  portamento_type_->setBounds(knob_width + 1 * space_x, space_y + extra_text_space,
                               selector_width, text_height);
-  legato_->setBounds(knob_width + selector_width + 3 * space_x, space_y + extra_text_space,
-                     text_width, text_height);
+
 
   SynthSection::resized();
 }

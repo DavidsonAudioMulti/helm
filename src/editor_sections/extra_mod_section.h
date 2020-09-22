@@ -37,7 +37,9 @@ class ExtraModSection : public SynthSection {
     ScopedPointer<ModulationButton> velocity_mod_;
     ScopedPointer<ModulationButton> mod_wheel_mod_;
     ScopedPointer<ModulationButton> pitch_wheel_mod_;
+    ScopedPointer<ModulationButton> breath_mod_;
     ScopedPointer<ModulationButton> random_mod_;
+    ScopedPointer<ToggleButton> legato_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ExtraModSection)
 };
