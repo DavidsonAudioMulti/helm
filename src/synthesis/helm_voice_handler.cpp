@@ -107,6 +107,9 @@ namespace mopo {
     Gate* choose_mod_wheel = new Gate();
     choose_mod_wheel->plug(channel(), Gate::kChoice);
 
+    Gate* choose_breath = new Gate();
+    choose_breath->plug(channel(), Gate::kChoice);
+
     for (int i = 0; i < mopo::NUM_MIDI_CHANNELS; ++i) {
       pitch_wheel_amounts_[i] = new cr::Value(0);
       choose_pitch_wheel_->plugNext(pitch_wheel_amounts_[i]);
@@ -114,15 +117,21 @@ namespace mopo {
       mod_wheel_amounts_[i] = new cr::Value(0);
       choose_mod_wheel->plugNext(mod_wheel_amounts_[i]);
 
+      breath_amounts_[i] = new cr::Value(0);
+      choose_breath->plugNext(breath_amounts_[i]);
+
       addGlobalProcessor(pitch_wheel_amounts_[i]);
       addGlobalProcessor(mod_wheel_amounts_[i]);
+      addGlobalProcessor(breath_amounts_[i]);
     }
 
     getMonoRouter()->addProcessor(choose_pitch_wheel_);
     getMonoRouter()->addProcessor(choose_mod_wheel);
+    getMonoRouter()->addProcessor(choose_breath);
 
     mod_sources_["pitch_wheel"] = choose_pitch_wheel_->output();
     mod_sources_["mod_wheel"] = choose_mod_wheel->output();
+    mod_sources_["breath"] = choose_breath->output();
 
     // Create all synthesizer voice components.
     createArticulation(note(), last_note(), velocity(), voice_event());
@@ -788,6 +797,11 @@ namespace mopo {
   void HelmVoiceHandler::setModWheel(mopo_float value, int channel) {
     MOPO_ASSERT(channel >= 1 && channel <= mopo::NUM_MIDI_CHANNELS);
     mod_wheel_amounts_[channel - 1]->set(value);
+  }
+
+  void HelmVoiceHandler::setBreath(mopo_float value, int channel) {
+      MOPO_ASSERT(channel >= 1 && channel <= mopo::NUM_MIDI_CHANNELS);
+      breath_amounts_[channel - 1]->set(value);
   }
 
   void HelmVoiceHandler::setPitchWheel(mopo_float value, int channel) {

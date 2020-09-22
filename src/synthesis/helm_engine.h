@@ -56,6 +56,7 @@ namespace mopo {
                   int sample = 0, int channel = 0) override;
       VoiceEvent noteOff(mopo_float note, int sample = 0) override;
       void setModWheel(mopo_float value, int channel = 0);
+      void setBreath(mopo_float value, int channel = 0);
       void setPitchWheel(mopo_float value, int channel = 0);
       void setBpm(mopo_float bpm);
       void correctToTime(mopo_float samples) override;

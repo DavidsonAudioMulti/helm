@@ -57,6 +57,7 @@ namespace mopo {
       VoiceEvent noteOff(mopo_float note, int sample = 0) override;
       bool shouldAccumulate(Output* output) override;
       void setModWheel(mopo_float value, int channel = 0);
+      void setBreath(mopo_float value, int channel = 0);
       void setPitchWheel(mopo_float value, int channel = 0);
       Output* note_retrigger() { return &note_retriggered_; }
 
@@ -84,6 +85,7 @@ namespace mopo {
       Processor* note_from_center_;
       Gate* choose_pitch_wheel_;
       Value* mod_wheel_amounts_[mopo::NUM_MIDI_CHANNELS];
+      Value* breath_amounts_[mopo::NUM_MIDI_CHANNELS];
       Value* pitch_wheel_amounts_[mopo::NUM_MIDI_CHANNELS];
       Processor* current_frequency_;
       Envelope* amplitude_envelope_;

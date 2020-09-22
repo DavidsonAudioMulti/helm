@@ -398,6 +398,10 @@ namespace mopo {
     voice_handler_->setModWheel(value, channel);
   }
 
+  void HelmEngine::setBreath(mopo_float value, int channel) {
+      voice_handler_->setBreath(value, channel);
+  }
+
   void HelmEngine::setPitchWheel(mopo_float value, int channel) {
     voice_handler_->setPitchWheel(value, channel);
   }
