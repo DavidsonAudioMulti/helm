@@ -24,6 +24,8 @@
 #define BANK_SELECT_NUMBER 0
 #define FOLDER_SELECT_NUMBER 32
 #define MOD_WHEEL_CONTROL_NUMBER 1
+#define BREATH_RESOLUTION 127
+#define BREATH_CONTROL_NUMBER 2
 
 MidiManager::MidiManager(SynthBase* synth, MidiKeyboardState* keyboard_state,
                          std::map<std::string, String>* gui_state, Listener* listener) :
@@ -96,57 +98,64 @@ void MidiManager::removeNextBlockOfMessages(MidiBuffer& buffer, int num_samples)
 }
 
 void MidiManager::processMidiMessage(const MidiMessage& midi_message, int sample_position) {
-  if (midi_message.isProgramChange()) {
-    current_patch_ = midi_message.getProgramChangeNumber();
-    File patch = LoadSave::loadPatch(current_bank_, current_folder_, current_patch_,
-                                     synth_, *gui_state_);
-    PatchLoadedCallback* callback = new PatchLoadedCallback(listener_, patch);
-    callback->post();
-    return;
-  }
-
-  if (midi_message.isNoteOn()) {
-    engine_->noteOn(midi_message.getNoteNumber(),
-                    midi_message.getVelocity() / (mopo::MIDI_SIZE - 1.0),
-                    0, midi_message.getChannel() - 1);
-  }
-  else if (midi_message.isNoteOff())
-    engine_->noteOff(midi_message.getNoteNumber());
-  else if (midi_message.isAllNotesOff())
-    engine_->allNotesOff();
-  else if (midi_message.isSustainPedalOn())
-    engine_->sustainOn();
-  else if (midi_message.isSustainPedalOff())
-    engine_->sustainOff();
-  else if (midi_message.isAftertouch()) {
-    mopo::mopo_float note = midi_message.getNoteNumber();
-    mopo::mopo_float value = (1.0 * midi_message.getAfterTouchValue()) / mopo::MIDI_SIZE;
-    engine_->setAftertouch(note, value);
-  }
-  else if (midi_message.isChannelPressure()) {
-    int channel = midi_message.getChannel();
-    mopo::mopo_float value = midi_message.getChannelPressureValue() / (mopo::MIDI_SIZE - 1.0f);
-    engine_->setChannelAftertouch(channel, value);
-  }
-  else if (midi_message.isPitchWheel()) {
-    double percent = (1.0 * midi_message.getPitchWheelValue()) / PITCH_WHEEL_RESOLUTION;
-    double value = 2 * percent - 1.0;
-    engine_->setPitchWheel(value, midi_message.getChannel());
-  }
-  else if (midi_message.isController()) {
-    int controller_number = midi_message.getControllerNumber();
-    if (controller_number == MOD_WHEEL_CONTROL_NUMBER) {
-      double percent = (1.0 * midi_message.getControllerValue()) / MOD_WHEEL_RESOLUTION;
-      engine_->setModWheel(percent, midi_message.getChannel());
+    if (midi_message.isProgramChange()) {
+        current_patch_ = midi_message.getProgramChangeNumber();
+        File patch = LoadSave::loadPatch(current_bank_, current_folder_, current_patch_,
+            synth_, *gui_state_);
+        PatchLoadedCallback* callback = new PatchLoadedCallback(listener_, patch);
+        callback->post();
+        return;
     }
-    else if (controller_number == BANK_SELECT_NUMBER)
-      current_bank_ = midi_message.getControllerValue();
-    else if (controller_number == FOLDER_SELECT_NUMBER)
-      current_folder_ = midi_message.getControllerValue();
-    midiInput(midi_message.getControllerNumber(), midi_message.getControllerValue());
-  }
-}
 
+    if (midi_message.isNoteOn()) {
+        engine_->noteOn(midi_message.getNoteNumber(),
+            midi_message.getVelocity() / (mopo::MIDI_SIZE - 1.0),
+            0, midi_message.getChannel() - 1);
+    }
+    else if (midi_message.isNoteOff())
+        engine_->noteOff(midi_message.getNoteNumber());
+    else if (midi_message.isAllNotesOff())
+        engine_->allNotesOff();
+    else if (midi_message.isSustainPedalOn())
+        engine_->sustainOn();
+    else if (midi_message.isSustainPedalOff())
+        engine_->sustainOff();
+    else if (midi_message.isAftertouch()) {
+        mopo::mopo_float note = midi_message.getNoteNumber();
+        mopo::mopo_float value = (1.0 * midi_message.getAfterTouchValue()) / mopo::MIDI_SIZE;
+        engine_->setAftertouch(note, value);
+    }
+    else if (midi_message.isChannelPressure()) {
+        int channel = midi_message.getChannel();
+        mopo::mopo_float value = midi_message.getChannelPressureValue() / (mopo::MIDI_SIZE - 1.0f);
+        engine_->setChannelAftertouch(channel, value);
+    }
+    else if (midi_message.isPitchWheel()) {
+        double percent = (1.0 * midi_message.getPitchWheelValue()) / PITCH_WHEEL_RESOLUTION;
+        double value = 2 * percent - 1.0;
+        engine_->setPitchWheel(value, midi_message.getChannel());
+    }
+
+    else if (midi_message.isController()) {
+        int controller_number = midi_message.getControllerNumber();
+        if (controller_number == MOD_WHEEL_CONTROL_NUMBER) {
+            double percent = (1.0 * midi_message.getControllerValue()) / MOD_WHEEL_RESOLUTION;
+            engine_->setModWheel(percent, midi_message.getChannel());
+        }
+        else if (midi_message.isController()) {
+            int controller_number = midi_message.getControllerNumber();
+            if (controller_number == BREATH_CONTROL_NUMBER) {
+                double percent = (1.0 * midi_message.getControllerValue()) / BREATH_RESOLUTION;
+                engine_->setBreath(percent, midi_message.getChannel());
+            }
+            else if (controller_number == BANK_SELECT_NUMBER)
+                current_bank_ = midi_message.getControllerValue();
+            else if (controller_number == FOLDER_SELECT_NUMBER)
+                current_folder_ = midi_message.getControllerValue();
+            midiInput(midi_message.getControllerNumber(), midi_message.getControllerValue());
+        }
+    }
+}
 void MidiManager::handleIncomingMidiMessage(MidiInput *source,
                                             const MidiMessage &midi_message) {
   midi_collector_.addMessageToQueue(midi_message);
